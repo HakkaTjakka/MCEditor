@@ -1,0 +1,43 @@
+MCRegion::MCRegion(int x0, int z0, int y0,
+                   int xl, int zl, int yl)
+{
+    A  	    =   (BlockInfo***)      calloc(xl ,	        sizeof(BlockInfo**));
+    A[0]    =   (BlockInfo**)	    calloc(xl*zl,	    sizeof(BlockInfo*));
+    for(int i=0; i<xl; i++)
+        A[i] = (*A+zl*i);
+
+    A[0][0] =   (BlockInfo*)        calloc(xl*zl*yl,	sizeof(BlockInfo));
+    for(int i=0; i<xl; i++)
+        for(int j=0; j<zl; j++)
+            A[i][j] = (*A[0]+zl*i*yl+yl*j);
+
+    B  	    =   (BlockEntity****)   calloc(xl ,	        sizeof(BlockEntity***));
+    B[0]    =   (BlockEntity***)	calloc(xl*zl,	    sizeof(BlockEntity**));
+    for(int i=0; i<xl; i++)
+        B[i] = (*B+zl*i);
+
+    B[0][0] =   (BlockEntity**)     calloc(xl*zl*yl,	sizeof(BlockEntity*));
+    memset(B[0][0], 0, xl*yl*zl*sizeof(BlockEntity*));
+    for(int i=0; i<xl; i++) {
+        for(int j=0; j<zl; j++) {
+            B[i][j] = (*B[0]+zl*i*yl+yl*j);
+        }
+    }
+
+    x_len = xl, z_len = zl, y_len = yl;
+    x_ori = x0, z_ori = z0, y_ori = y0;
+}
+
+MCRegion::~MCRegion()
+{
+    free(A[0][0]);
+    free(A[0]);
+    free(A);
+    for (int i = 0; i < x_len; i++)
+        for (int j = 0; j < z_len; j++)
+            for (int k = 0; k < y_len; k++)
+                if (B[i][j][k]) delBlockEntity(B[i][j][k]);
+    free(B[0][0]);
+    free(B[0]);
+    free(B);
+}
